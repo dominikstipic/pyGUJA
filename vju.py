@@ -8,29 +8,30 @@ from PyQt5.QtWidgets import (
     QLabel, 
     QWidget)
 
-class QSearchWidget(QHBoxLayout):
+class QSearchLayout(QHBoxLayout):
+    def on_click(self):
+        text = self.search.text()
+
     def __init__(self):
         super().__init__()
-        self.addWidget(QLineEdit())
-        self.addWidget(QPushButton(">>"))
-        self.addWidget(QPushButton("|||"))
+        self.search = QLineEdit()
+        self.submit = QPushButton(">>")
+        self.viz    = QPushButton("|||")
+        self.addWidget(self.search)
+        self.addWidget(self.submit)
+        self.addWidget(self.viz)
 
-class QListWidget(QVBoxLayout):
+        self.submit.clicked.connect(self.on_click)
+
+class QListLayout(QVBoxLayout):
     def __init__(self):
         super().__init__()
     
     def add(self, message):
         self.addWidget(QLabel(message))
 
-class QInfoWidget(QHBoxLayout):
-    def __init__(self):
-        super().__init__()
-        self.addWidget(QPushButton("|||"))
-
 class QMainWindows(QWidget):
     title = "Pile file"
-    #search_widget = QSearchWidget()
-    #list_widget   = QListWidget()
 
     def __init__(self):
         super().__init__()
@@ -38,16 +39,13 @@ class QMainWindows(QWidget):
         self.move(0, 0)
         self.resize(400, 100)
 
+        self.list_widget   = QListLayout()
+        self.search_widget = QSearchLayout()
+
         outerLayout = QVBoxLayout()
-        top_layout  = QSearchWidget()
-        bottom_layout = QListWidget()
-        outerLayout.addLayout(top_layout)
-        outerLayout.addLayout(bottom_layout)
+        outerLayout.addLayout(self.search_widget)
+        outerLayout.addLayout(self.list_widget)
         self.setLayout(outerLayout)
-
-
-
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
