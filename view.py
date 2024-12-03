@@ -117,7 +117,7 @@ class QMainWindows(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(self.title)
-        self.move(70, 70)
+        self.move(200, 200)
         self.resize(400, 100)
         self.search_widget = QSearchLayout(self)
         self.list_widget   = QListLayout()
