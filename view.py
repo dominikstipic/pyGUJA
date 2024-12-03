@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (
     QMessageBox)
 from PyQt5.QtGui import QPixmap
 from pathlib import Path
+from PyQt5.QtCore import Qt
 import model
 import os
 
@@ -61,7 +62,9 @@ class QListLayout(QVBoxLayout):
         super().__init__()
     
     def add(self, message):
-        self.addWidget(QLabel(message))
+        label = QLabel(message)
+        label.setStyleSheet("border: 2px solid black;") 
+        self.addWidget(label)
 
     def clear(self):
         self.current_files = []
@@ -85,12 +88,13 @@ class QListLayout(QVBoxLayout):
         model.create_bar(file_name, file_sizes)
         pixmap = QPixmap('data.png')
         label = QLabel()
+        label.setAlignment(Qt.AlignHCenter)
         label.setPixmap(pixmap)
         self.addWidget(label)
 
     def update(self, path):
         self.clear()
-        ms = model.file_walker(path)
+        ms = model.file_walker_leveled(path)
         self.current_files = ms
         for m in ms:
             file_name = m.split("/")[-1] 

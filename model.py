@@ -10,6 +10,14 @@ def parse_args() -> str:
     args = parser.parse_args()
     return args.path
 
+def file_walker_leveled(path):
+    paths = glob.glob(f'{path}/*')
+    result = []
+    for p in paths:
+        if os.path.isfile(p):
+            result.append(p)
+    return result
+
 def file_walker_gen(path):
     paths = glob.glob(f'{path}/*')
     for p in paths:
