@@ -14,47 +14,8 @@ from pathlib import Path
 from PyQt5.QtCore import Qt
 import model
 import os
+import random
 
-
-def fire_message(message, x, y):
-    msg_box = QMessageBox() 
-    msg_box.setIcon(QMessageBox.Information) 
-    msg_box.setText(message)
-    msg_box.setWindowTitle("Info!")
-    msg_box.setStandardButtons(QMessageBox.Ok)
-    msg_box.move(x, y)
-    msg_box.exec_()
-
-class QSearchLayout(QHBoxLayout):
-    is_init = False
-    def on_submit_click(self):
-        path = self.search.text()
-        path = Path(path)
-        if not path.exists():
-            message = "Path does not exist"
-            fire_message(message, self.main_window.x, self.main_window.y)
-        else:
-            self.is_init = True
-            self.main_window.list_widget.update(path)
-
-    def on_viz_click(self):
-        if self.is_init:
-            self.main_window.list_widget.vizualize()
-            
-        else:
-            fire_message("Cannot vizualize", self.main_window.x, self.main_window.y)
-
-    def __init__(self, main_window):
-        super().__init__()
-        self.main_window = main_window
-        self.search = QLineEdit()
-        self.submit = QPushButton(">>")
-        self.viz    = QPushButton("|||")
-        self.addWidget(self.search)
-        self.addWidget(self.submit)
-        self.addWidget(self.viz)
-        self.submit.clicked.connect(self.on_submit_click)
-        self.viz.clicked.connect(self.on_viz_click)
 
 class QListLayout(QVBoxLayout):
     current_files = []
@@ -84,8 +45,8 @@ class QListLayout(QVBoxLayout):
         ns = f.split()
         ns = [n[0].lower() for n in ns]
         if "." in f:
-            suf = f.split(".")
-            name = f"{"".join(ns)}.{suf[-1]}"
+            _, suf = f.split(".")
+            name = f"{"".join(ns)}.{suf}"
         else:
             name = f"{"".join(ns)}"
         return name 
@@ -111,6 +72,12 @@ class QListLayout(QVBoxLayout):
             file_name = m.split("/")[-1] 
             self.add(file_name)
 
+
+def generate_random_string(length):
+    characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    result = ''.join(random.choice(characters) for i in range(length))
+    return result
+
 class QMainWindows(QWidget):
     title = "File analysis"
 
@@ -119,12 +86,10 @@ class QMainWindows(QWidget):
         self.setWindowTitle(self.title)
         self.move(70, 70)
         self.resize(400, 100)
-        self.search_widget = QSearchLayout(self)
         self.list_widget   = QListLayout()
 
         # A
         self.outerLayout = QVBoxLayout()
-        self.outerLayout.addLayout(self.search_widget)
         self.setLayout(self.outerLayout)
 
         # S
@@ -132,18 +97,30 @@ class QMainWindows(QWidget):
         self.outerLayout.addWidget(scroll_area)
         scroll_area.setWidgetResizable(True)
 
-        # B
         b_widget = QWidget()
         b_widget.setLayout(self.list_widget)
         scroll_area.setWidget(b_widget)
-        
+
+        ######### TEST ##############
+        for _ in range(100):
+            X = generate_random_string(10)
+            self.list_widget.add(X)
+        #######################
+
     def moveEvent(self, event):
         new_pos = event.pos()
         self.x, self.y = new_pos.x(), new_pos.y()
         super().moveEvent(event) 
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    win = QMainWindows()
-    win.show()
-    sys.exit(app.exec_())
+
+
+def populate(window):
+    for _ in range(100):
+        X = generate_random_string(10)
+        window.list_widget.add(X)
+
+app = QApplication(sys.argv)
+win = QMainWindows()
+#populate(win)
+win.show()
+sys.exit(app.exec_())
