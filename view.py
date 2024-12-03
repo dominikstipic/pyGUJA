@@ -48,6 +48,7 @@ class QSearchLayout(QHBoxLayout):
         super().__init__()
         self.main_window = main_window
         self.search = QLineEdit()
+        self.search.setPlaceholderText("Enter the path")
         self.submit = QPushButton(">>")
         self.viz    = QPushButton("|||")
         self.addWidget(self.search)
