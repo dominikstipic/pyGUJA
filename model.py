@@ -54,7 +54,7 @@ def create_bar(xs, ys, title="Analysis"):
     plt.ylabel("Y")
     plt.grid(True)
     plt.title(title)
-    plt.xticks(rotation=90)
+    plt.xticks(rotation=10)
     plt.savefig("data.png")
     for bar in bars:
         height = round(bar.get_height(), 1)

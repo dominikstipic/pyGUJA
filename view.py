@@ -78,9 +78,20 @@ class QListLayout(QVBoxLayout):
     def file_size(self, file):
         absolute_path = Path(file).resolve()
         return os.path.getsize(absolute_path) / 1000
+    
+    def get_file_encoded_names(self, f):
+        ns = f.split()
+        ns = [n[0].lower() for n in ns]
+
+        if "." in f:
+            pref, suf = f.split(".")
+            name = f"{"".join(ns)}.{suf}"
+        else:
+            name = f"{"".join(ns)}"
+        return name 
 
     def vizualize(self):
-        file_name = [fs.split("/")[-1] for fs in self.current_files]
+        file_name = [self.get_file_encoded_names(fs.split("/")[-1]) for fs in self.current_files]
         file_sizes = [self.file_size(fs) for fs in self.current_files]
         
         self.clear()
