@@ -14,6 +14,7 @@ from pathlib import Path
 from PyQt5.QtCore import Qt
 import model
 import os
+import math
 
 
 def fire_message(message, x, y):
@@ -39,8 +40,7 @@ class QSearchLayout(QHBoxLayout):
 
     def on_viz_click(self):
         if self.is_init:
-            self.main_window.list_widget.vizualize()
-            
+            self.main_window.list_widget.vizualize()  
         else:
             fire_message("Cannot vizualize", self.main_window.x, self.main_window.y)
 
@@ -60,8 +60,9 @@ class QSearchLayout(QHBoxLayout):
 class QListLayout(QVBoxLayout):
     current_files = []
 
-    def __init__(self):
+    def __init__(self, main):
         super().__init__()
+        self.main = main
     
     def add(self, message):
         label = QLabel(message)
@@ -94,7 +95,6 @@ class QListLayout(QVBoxLayout):
     def vizualize(self):
         file_name = [self.get_file_encoded_names(fs.split("/")[-1]) for fs in self.current_files]
         file_sizes = [self.file_size(fs) for fs in self.current_files]
-        
         self.clear()
         print(file_name)
         model.create_bar(file_name, file_sizes)
@@ -103,25 +103,49 @@ class QListLayout(QVBoxLayout):
         label.setAlignment(Qt.AlignHCenter)
         label.setPixmap(pixmap)
         self.addWidget(label)
+        NH = label.size().height()
+        RATIO = math.ceil(NH / self.main.HEIGHT * 1.1111) 
+        self.main.scale_window(RATIO)
 
     def update(self, path):
         self.clear()
         ms = model.file_walker_leveled(path)
         self.current_files = ms
+        max_sen_size = 0
         for m in ms:
             file_name = m.split("/")[-1] 
+            max_sen_size = max(max_sen_size, len(file_name))
             self.add(file_name)
+        print(max_sen_size)
+        CHAR_PX = 7
+        NEW_WIDTH = CHAR_PX*max_sen_size
+        RATIO = math.ceil(NEW_WIDTH / self.main.WIDTH)
+        self.main.scale_window(RATIO)
 
 class QMainWindows(QWidget):
-    title = "File analysis"
+    title = "Darth Vader Starship"
+    WIDTH  = 200
+    HEIGHT = 600
+
+    def resizeEvent(self, event):
+        new_size = self.size() 
+        self.WIDTH = new_size.width()
+        self.HEIGHT = new_size.height()
+        print(f"Window resized to width: {self.WIDTH}, height: {self.HEIGHT}")
+
+    def scale_window(self, factor):
+        geometry = self.geometry()
+        self.WIDTH = geometry.width() * factor
+        self.HEIGHT = geometry.height() * factor
+        self.resize(self.HEIGHT, self.WIDTH)
 
     def __init__(self):
         super().__init__()
         self.setWindowTitle(self.title)
         self.move(200, 200)
-        self.resize(400, 100)
+        self.scale_window(1)
         self.search_widget = QSearchLayout(self)
-        self.list_widget   = QListLayout()
+        self.list_widget   = QListLayout(self)
 
         # A
         self.outerLayout = QVBoxLayout()
